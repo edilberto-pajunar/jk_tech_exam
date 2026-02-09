@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:jk_tech_exam/app/app_locator.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -30,6 +31,8 @@ Future<void> bootstrap(Function() builder) async {
   Bloc.observer = const AppBlocObserver();
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  setupLocator();
 
   // Add cross-flavor configuration here
 

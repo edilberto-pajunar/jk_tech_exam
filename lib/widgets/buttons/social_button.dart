@@ -7,29 +7,45 @@ class SocialButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onPressed,
+    this.borderColor = AppColor.primaryColor,
+    this.textColor = AppColor.primaryColor,
+    this.borderRadius,
     required this.icon,
   });
 
   final String text;
   final VoidCallback onPressed;
   final String icon;
+  final Color borderColor;
+  final Color textColor;
+  final double? borderRadius;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return OutlinedButton.icon(
-      onPressed: () {},
+
+    return OutlinedButton(
+      onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         backgroundColor: AppColor.whiteColor,
-        foregroundColor: AppColor.primaryColor,
-        side: const BorderSide(color: AppColor.primaryColor),
+        foregroundColor: textColor,
+        side: BorderSide(color: borderColor),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(borderRadius ?? 12.0),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 13.0),
+        padding: const EdgeInsets.symmetric(vertical: 18.0),
       ),
-      label: Text(text),
-      icon: SvgPicture.asset(icon),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(icon, height: 20, width: 20),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: theme.textTheme.bodyMedium!.copyWith(color: textColor),
+          ),
+        ],
+      ),
     );
   }
 }

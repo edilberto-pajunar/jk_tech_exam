@@ -74,10 +74,7 @@ class _PrimaryTextFieldState<T> extends State<PrimaryTextField<T>> {
         FormBuilderTextField(
           autovalidateMode: AutovalidateMode.onUserInteraction,
           name: widget.name,
-          style: theme.textTheme.bodyMedium!.copyWith(
-            color: AppColor.whiteColor,
-          ),
-
+          style: theme.textTheme.bodyMedium!.copyWith(),
           keyboardType: widget.numberOnly
               ? TextInputType.number
               : TextInputType.text,

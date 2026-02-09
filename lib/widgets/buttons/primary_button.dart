@@ -22,24 +22,41 @@ class PrimaryButton extends StatelessWidget {
     this.borderColor,
   }) : variant = ButtonVariant.primary;
 
+  static const _radius = 48.0;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: enabled ? onPressed : null,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 13.0),
-          disabledBackgroundColor: AppColor.disabledColor,
-          backgroundColor: AppColor.primaryColor,
-        ),
-        child: Text(
-          text,
-          style: theme.textTheme.bodyMedium!.copyWith(
-            color: AppColor.whiteColor,
-            fontWeight: FontWeight.w500,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: enabled ? onPressed : null,
+          borderRadius: BorderRadius.circular(_radius),
+          child: Ink(
+            padding: const EdgeInsets.symmetric(vertical: 13.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(_radius),
+              gradient: enabled
+                  ? const LinearGradient(
+                      colors: [AppColor.primaryColor, AppColor.secondaryColor],
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                    )
+                  : null,
+              color: enabled ? backgroundColor : AppColor.disabledColor,
+            ),
+            child: Center(
+              child: Text(
+                text,
+                style: theme.textTheme.bodyMedium!.copyWith(
+                  color: textColor ?? AppColor.whiteColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
         ),
       ),
