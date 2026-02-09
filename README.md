@@ -1,5 +1,13 @@
 # jk_tech_exam
 
+# Assessment
+
+1. I only follow the register and login api.
+2. I validate if the user is existing in the mock @user.dart, then call the api itself.
+3. Some example data are on the model itself.
+4. I also created a whole abstract for calling the api @client/
+5. I implement a local storage for caching the current user, and validates then reroute if the user is valid then go to the @home_page.
+
 Flutter app built with clean architecture, BLoC, and common form/validation and testing tooling.
 
 ## Business
