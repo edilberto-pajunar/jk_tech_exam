@@ -50,7 +50,7 @@ class IAuthRepository extends ApiClient implements AuthRepository {
   }
 
   @override
-  Future<void> createAccount({
+  Future<AppUser> createAccount({
     required String password,
     required String email,
   }) async {
@@ -59,5 +59,6 @@ class IAuthRepository extends ApiClient implements AuthRepository {
       data: {"email": email, "password": password},
     );
     print(response);
+    return AppUser.getUsers().firstWhere((user) => user.email == email);
   }
 }

@@ -6,13 +6,13 @@ enum AppAuthStatus { authenticated, unauthenticated }
 
 class AppState extends Equatable {
   final AppStatus status;
-  final AppAuthStatus authStatus;
+  final AppAuthStatus? authStatus;
   final AppUser? user;
   final String? errorMessage;
 
   const AppState({
     this.status = AppStatus.initial,
-    this.authStatus = AppAuthStatus.unauthenticated,
+    this.authStatus,
     this.user,
     this.errorMessage,
   });

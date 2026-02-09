@@ -10,3 +10,7 @@ class AppEvent extends Equatable {
 class AppInitRequested extends AppEvent {
   const AppInitRequested();
 }
+
+class AppLogoutRequested extends AppEvent {
+  const AppLogoutRequested();
+}

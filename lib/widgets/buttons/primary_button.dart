@@ -11,6 +11,7 @@ class PrimaryButton extends StatelessWidget {
   final Color? textColor;
   final Color? backgroundColor;
   final Color? borderColor;
+  final Color? disabledColor;
 
   const PrimaryButton({
     super.key,
@@ -20,6 +21,7 @@ class PrimaryButton extends StatelessWidget {
     this.textColor,
     this.backgroundColor,
     this.borderColor,
+    this.disabledColor,
   }) : variant = ButtonVariant.primary;
 
   static const _radius = 48.0;
@@ -39,14 +41,16 @@ class PrimaryButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 13.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(_radius),
-              gradient: enabled
+              gradient: backgroundColor == null && enabled
                   ? const LinearGradient(
                       colors: [AppColor.primaryColor, AppColor.secondaryColor],
                       begin: Alignment.centerRight,
                       end: Alignment.centerLeft,
                     )
                   : null,
-              color: enabled ? backgroundColor : AppColor.disabledColor,
+              color: enabled
+                  ? backgroundColor
+                  : disabledColor ?? AppColor.disabledColor,
             ),
             child: Center(
               child: Text(

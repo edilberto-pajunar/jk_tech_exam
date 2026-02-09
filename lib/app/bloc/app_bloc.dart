@@ -12,6 +12,7 @@ part 'app_state.dart';
 class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc() : super(const AppState()) {
     on<AppInitRequested>(_onInitRequested);
+    on<AppLogoutRequested>(_onLogoutRequested);
   }
 
   void _onInitRequested(AppInitRequested event, Emitter<AppState> emit) async {
@@ -26,5 +27,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ),
       );
     }
+  }
+
+  void _onLogoutRequested(
+    AppLogoutRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    await getIt<SharedPreferenceService>().clear();
+    emit(state.copyWith(authStatus: AppAuthStatus.unauthenticated, user: null));
   }
 }

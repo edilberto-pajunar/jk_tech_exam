@@ -25,7 +25,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final user = await _authRepository.login(email: event.email, password: event.password);
       await getIt<SharedPreferenceService>().setString(
         "currentUser",
-        jsonEncode(user),
+        jsonEncode(user.toJson()),
       );
       emit(state.copyWith(status: LoginStatus.success));
     } on ApiExceptions catch (e) {

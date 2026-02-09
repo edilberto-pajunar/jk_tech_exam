@@ -20,4 +20,8 @@ class SharedPreferenceService {
   int? getInt(String key) {
     return _prefs.getInt(key);
   }
+
+  Future<void> clear() async {
+    await _prefs.clear();
+  }
 }

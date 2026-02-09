@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:jk_tech_exam/app/app_locator.dart';
 import 'package:jk_tech_exam/client/model/api_exceptions.dart';
 import 'package:jk_tech_exam/features/auth/repository/auth_repository.dart';
 import 'package:jk_tech_exam/features/dashboard/community/data/model/user.dart';
+import 'package:jk_tech_exam/local/shared_preference_service.dart';
 
 part 'register_event.dart';
 part 'register_state.dart';
@@ -56,9 +60,13 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     }
     emit(state.copyWith(status: RegisterStatus.loading));
     try {
-      await _authRepository.createAccount(
+      final user = await _authRepository.createAccount(
         password: event.password,
         email: state.user!.email,
+      );
+      await getIt<SharedPreferenceService>().setString(
+        "currentUser",
+        jsonEncode(user.toJson()),
       );
       emit(state.copyWith(status: RegisterStatus.success));
     } on ApiExceptions catch (e) {

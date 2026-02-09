@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:jk_tech_exam/shared/image.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -11,7 +12,7 @@ enum AppUserStatus {
 }
 
 @JsonSerializable(explicitToJson: true)
-class AppUser {
+class AppUser extends Equatable {
   final String id;
   final String fullName;
   final String imageUrl;
@@ -19,7 +20,7 @@ class AppUser {
   final AppUserStatus status;
   final String? token;
 
-  AppUser({
+  const AppUser({
     required this.id,
     required this.fullName,
     required this.imageUrl,
@@ -50,21 +51,21 @@ class AppUser {
   Map<String, dynamic> toJson() => _$AppUserToJson(this);
 
   static List<AppUser> getUsers() => [
-    AppUser(
+    const AppUser(
       id: '1',
       fullName: 'Alfonso George',
       imageUrl: AppImage.user1,
       email: 'alfonso@gmail.com',
       status: AppUserStatus.active,
     ),
-    AppUser(
+    const AppUser(
       id: '2',
       fullName: 'John Doe',
       imageUrl: AppImage.user1,
       email: 'test@gmail.com',
       status: AppUserStatus.inactive,
     ),
-    AppUser(
+    const AppUser(
       id: '3',
       fullName: 'Eve Holt',
       imageUrl: AppImage.user1,
@@ -72,4 +73,7 @@ class AppUser {
       status: AppUserStatus.inactive,
     ),
   ];
+
+  @override
+  List<Object?> get props => [id, fullName, imageUrl, email, status, token];
 }

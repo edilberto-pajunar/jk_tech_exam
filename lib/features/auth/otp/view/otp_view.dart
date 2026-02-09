@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jk_tech_exam/features/auth/create_password/view/create_password_page.dart';
-import 'package:jk_tech_exam/features/auth/utils/auth_dialog.dart';
 import 'package:jk_tech_exam/shared/colors.dart';
 import 'package:jk_tech_exam/widgets/buttons/primary_button.dart';
 import 'package:pinput/pinput.dart';
@@ -23,6 +22,7 @@ class _OtpViewState extends State<OtpView> {
   late DateTime _expiresAt;
   int _remainingSeconds = _otpSeconds;
   Timer? _timer;
+  bool _showError = false;
 
   @override
   void initState() {
@@ -107,12 +107,27 @@ class _OtpViewState extends State<OtpView> {
                 height: 60,
                 decoration: BoxDecoration(
                   color: AppColor.whiteColor,
-                  border: Border.all(color: AppColor.borderColor),
+                  border: Border.all(
+                    color: _showError
+                        ? AppColor.errorColor
+                        : AppColor.borderColor,
+                  ),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
               ),
-              onChanged: (value) {},
+              onChanged: (value) {
+                if (_showError) setState(() => _showError = false);
+              },
             ),
+            if (_showError) ...[
+              const SizedBox(height: 8.0),
+              Text(
+                "Double-check that you're entering the OTP exactly as received",
+                style: theme.textTheme.bodySmall!.copyWith(
+                  color: AppColor.errorColor,
+                ),
+              ),
+            ],
             const SizedBox(height: 24.0),
             RichText(
               textAlign: TextAlign.center,
@@ -138,22 +153,22 @@ class _OtpViewState extends State<OtpView> {
                   context.pushNamed(CreatePasswordPage.route);
                   _timer?.cancel();
                   _pinController.clear();
+                  setState(() => _showError = false);
                 } else {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text("Invalid OTP")));
+                  setState(() => _showError = true);
                 }
               },
             ),
             const SizedBox(height: 16.0),
             PrimaryButton(
-              backgroundColor: Colors.transparent,
+              backgroundColor: AppColor.whiteColor,
               text: "Resend Code",
               textColor: _remainingSeconds == 0
                   ? AppColor.primaryColor
                   : AppColor.greyColor,
               onPressed: _remainingSeconds == 0 ? _resendCode : null,
-              enabled: _remainingSeconds == 0,
+              enabled: true,
+              disabledColor: AppColor.whiteColor,
             ),
           ],
         ),

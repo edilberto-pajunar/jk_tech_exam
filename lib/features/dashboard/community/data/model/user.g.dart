@@ -14,6 +14,7 @@ AppUser _$AppUserFromJson(Map<String, dynamic> json) => AppUser(
   status:
       $enumDecodeNullable(_$AppUserStatusEnumMap, json['status']) ??
       AppUserStatus.active,
+  token: json['token'] as String?,
 );
 
 Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
@@ -22,6 +23,7 @@ Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
   'imageUrl': instance.imageUrl,
   'email': instance.email,
   'status': _$AppUserStatusEnumMap[instance.status]!,
+  'token': instance.token,
 };
 
 const _$AppUserStatusEnumMap = {
