@@ -10,4 +10,5 @@ class AppColor {
   static const Color borderColor = Color(0xFFCBD5E1);
   static const Color hintColor = Color(0xFF94A3B8);
   static const Color greyColor = Color(0xFF64748B);
+  static const Color accentColor = Color(0xFFFFBF00);
 }
