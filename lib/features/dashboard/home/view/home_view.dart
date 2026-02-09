@@ -56,14 +56,16 @@ class _HomeViewState extends State<HomeView>
                   children: [
                     const Flexible(child: SearchTextField(hintText: "Search")),
                     const SizedBox(width: 16.0),
-                    SvgPicture.asset(AppImage.notification),
+                    Badge.count(
+                      count: 10,
+                      child: SvgPicture.asset(AppImage.notification),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
           SliverPersistentHeader(
-            pinned: true,
             delegate: _TabBarDelegate(
               TabBar(
                 controller: _tabController,

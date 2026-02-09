@@ -5,6 +5,11 @@ class PublicServiceTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return const SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(children: [Text("Public Service")]),
+      ),
+    );
   }
 }

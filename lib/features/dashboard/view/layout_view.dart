@@ -81,6 +81,7 @@ class LayoutView extends StatelessWidget {
                             final index = LayoutPageTab.values.indexOf(tab);
                             final isSelected = shell.currentIndex == index;
                             return _buildNavItem(
+                              badgeCount: index == 2 ? 10 : null,
                               tab: tab,
                               isSelected: isSelected,
                               onTap: () =>
@@ -126,6 +127,7 @@ class LayoutView extends StatelessWidget {
     required LayoutPageTab tab,
     required bool isSelected,
     required VoidCallback onTap,
+    int? badgeCount,
   }) {
     return Expanded(
       child: InkWell(
@@ -134,17 +136,32 @@ class LayoutView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              tab.icon,
-              width: 24,
-              height: 24,
-              colorFilter: isSelected
-                  ? const ColorFilter.mode(
-                      AppColor.primaryColor,
-                      BlendMode.srcIn,
-                    )
-                  : null,
-            ),
+            badgeCount != null
+                ? Badge.count(
+                    count: badgeCount,
+                    child: SvgPicture.asset(
+                      tab.icon,
+                      width: 24,
+                      height: 24,
+                      colorFilter: isSelected
+                          ? const ColorFilter.mode(
+                              AppColor.primaryColor,
+                              BlendMode.srcIn,
+                            )
+                          : null,
+                    ),
+                  )
+                : SvgPicture.asset(
+                    tab.icon,
+                    width: 24,
+                    height: 24,
+                    colorFilter: isSelected
+                        ? const ColorFilter.mode(
+                            AppColor.primaryColor,
+                            BlendMode.srcIn,
+                          )
+                        : null,
+                  ),
             const SizedBox(height: 4),
             Text(
               tab.title,

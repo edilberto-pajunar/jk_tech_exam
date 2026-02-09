@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jk_tech_exam/extensions/date_extensions.dart';
 import 'package:jk_tech_exam/features/dashboard/community/data/model/community.dart';
 import 'package:jk_tech_exam/features/dashboard/community/data/model/post.dart';
+import 'package:jk_tech_exam/features/dashboard/home/widgets/for_you/news_carousel_card.dart';
 import 'package:jk_tech_exam/features/dashboard/public_service/data/model/public_service.dart';
 import 'package:jk_tech_exam/features/dashboard/videos/data/model/news.dart';
 import 'package:jk_tech_exam/shared/colors.dart';
@@ -38,95 +39,12 @@ class _ForYouTabState extends State<ForYouTab> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            CarouselSlider(
-              items: allNews.map((news) {
-                return Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: news.isBreakingNews
-                        ? AppColor.accentColor
-                        : AppColor.whiteColor,
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      news.isBreakingNews
-                          ? Badge(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                                vertical: 4.0,
-                              ),
-                              backgroundColor: AppColor.whiteColor,
-                              alignment: Alignment.topLeft,
-                              offset: const Offset(12, 12),
-                              label: Row(
-                                children: [
-                                  SvgPicture.asset(AppImage.breaking),
-                                  const SizedBox(width: 4.0),
-                                  Text(
-                                    "Breaking News",
-                                    style: theme.textTheme.bodySmall!
-                                        .copyWith(),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.asset(
-                                  news.imageUrl,
-                                  fit: BoxFit.cover,
-                                  height: 200,
-                                  width: double.infinity,
-                                ),
-                              ),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.asset(
-                                news.imageUrl,
-                                fit: BoxFit.cover,
-                                height: 200,
-                                width: double.infinity,
-                              ),
-                            ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        news.isBreakingNews ? "🚨 ${news.title}" : news.title,
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "${news.reporter} · ${news.createdAt.toRelativeTime()}",
-                        style: theme.textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              options: CarouselOptions(
-                autoPlay: false,
-                viewportFraction: 1,
-                height: 300,
-                initialPage: 0,
-                onPageChanged: (index, reason) {
-                  setState(() => _activeIndex = index);
-                },
-              ),
-            ),
-            const SizedBox(height: 12.0),
-            AnimatedSmoothIndicator(
+            NewsCarouselCard(
+              allNews: allNews,
+              onPageChanged: (index, reason) {
+                setState(() => _activeIndex = index);
+              },
               activeIndex: _activeIndex,
-              count: allNews.length,
-              effect: const SlideEffect(
-                radius: 20.0,
-                dotWidth: 10.0,
-                dotHeight: 10.0,
-                activeDotColor: Color(0xFF94A3B8),
-                dotColor: Color(0xFFE2E8F0),
-              ),
             ),
             const SizedBox(height: 24.0),
             PrimaryCard(
