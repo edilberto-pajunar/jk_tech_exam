@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jk_tech_exam/app/app_locator.dart';
 
 class AppBlocObserver extends BlocObserver {
@@ -32,7 +33,10 @@ Future<void> bootstrap(Function() builder) async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  setupLocator();
+  // set up singleton
+  await setupLocator();
+
+  await dotenv.load(fileName: ".env");
 
   // Add cross-flavor configuration here
 

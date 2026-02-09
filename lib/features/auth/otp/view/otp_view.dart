@@ -1,11 +1,71 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:jk_tech_exam/features/auth/create_password/view/create_password_page.dart';
 import 'package:jk_tech_exam/features/auth/utils/auth_dialog.dart';
 import 'package:jk_tech_exam/shared/colors.dart';
 import 'package:jk_tech_exam/widgets/buttons/primary_button.dart';
 import 'package:pinput/pinput.dart';
 
-class OtpView extends StatelessWidget {
+class OtpView extends StatefulWidget {
   const OtpView({super.key});
+
+  @override
+  State<OtpView> createState() => _OtpViewState();
+}
+
+class _OtpViewState extends State<OtpView> {
+  static const _mockOTP = "123456";
+  static const _otpSeconds = 300;
+
+  final _pinController = TextEditingController();
+  late DateTime _expiresAt;
+  int _remainingSeconds = _otpSeconds;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _expiresAt = DateTime.now().add(const Duration(seconds: _otpSeconds));
+    _remainingSeconds = _expiresAt
+        .difference(DateTime.now())
+        .inSeconds
+        .clamp(0, _otpSeconds);
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final remaining = _expiresAt
+          .difference(DateTime.now())
+          .inSeconds
+          .clamp(0, _otpSeconds);
+      setState(() => _remainingSeconds = remaining);
+      if (remaining == 0) _timer?.cancel();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pinController.dispose();
+    super.dispose();
+  }
+
+  void _resendCode() {
+    setState(() {
+      _expiresAt = DateTime.now().add(const Duration(seconds: _otpSeconds));
+      _remainingSeconds = _otpSeconds;
+      _timer?.cancel();
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted) return;
+        final remaining = _expiresAt
+            .difference(DateTime.now())
+            .inSeconds
+            .clamp(0, _otpSeconds);
+        setState(() => _remainingSeconds = remaining);
+        if (remaining == 0) _timer?.cancel();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +102,7 @@ class OtpView extends StatelessWidget {
             const SizedBox(height: 4.0),
             Pinput(
               length: 6,
+              controller: _pinController,
               defaultPinTheme: PinTheme(
                 height: 60,
                 decoration: BoxDecoration(
@@ -50,9 +111,7 @@ class OtpView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
               ),
-              onChanged: (value) {
-                print(value);
-              },
+              onChanged: (value) {},
             ),
             const SizedBox(height: 24.0),
             RichText(
@@ -62,7 +121,7 @@ class OtpView extends StatelessWidget {
                 style: theme.textTheme.bodyMedium,
                 children: [
                   TextSpan(
-                    text: "300 seconds",
+                    text: "$_remainingSeconds seconds",
                     style: theme.textTheme.bodyMedium!.copyWith(
                       color: AppColor.primaryColor,
                       fontWeight: FontWeight.w600,
@@ -75,19 +134,26 @@ class OtpView extends StatelessWidget {
             PrimaryButton(
               text: "Next",
               onPressed: () {
-                print("Next");
-                AuthDialog.showTermsAndConditionConsent(context);
+                if (_pinController.text == _mockOTP) {
+                  context.pushNamed(CreatePasswordPage.route);
+                  _timer?.cancel();
+                  _pinController.clear();
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text("Invalid OTP")));
+                }
               },
             ),
             const SizedBox(height: 16.0),
             PrimaryButton(
               backgroundColor: Colors.transparent,
               text: "Resend Code",
-              textColor: AppColor.primaryColor,
-              onPressed: () {
-                print("Resend code");
-                AuthDialog.showAccountLocked(context);
-              },
+              textColor: _remainingSeconds == 0
+                  ? AppColor.primaryColor
+                  : AppColor.greyColor,
+              onPressed: _remainingSeconds == 0 ? _resendCode : null,
+              enabled: _remainingSeconds == 0,
             ),
           ],
         ),

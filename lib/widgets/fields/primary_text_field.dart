@@ -80,7 +80,9 @@ class _PrimaryTextFieldState<T> extends State<PrimaryTextField<T>> {
               : TextInputType.text,
           cursorColor: AppColor.primaryColor,
           maxLines: 1,
-          obscureText: widget.obscureText && !isPasswordVisible,
+          obscureText:
+              (widget.obscureText || widget.showPasswordToggle) &&
+              !isPasswordVisible,
           inputFormatters: widget.numberOnly
               ? [FilteringTextInputFormatter.digitsOnly]
               : [],

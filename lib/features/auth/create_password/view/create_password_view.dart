@@ -1,10 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jk_tech_exam/features/auth/login/view/login_page.dart';
+import 'package:jk_tech_exam/features/auth/register/bloc/register_bloc.dart';
 import 'package:jk_tech_exam/features/auth/register/view/register_page.dart';
+import 'package:jk_tech_exam/features/dashboard/home/view/home_page.dart';
 import 'package:jk_tech_exam/shared/colors.dart';
 import 'package:jk_tech_exam/widgets/buttons/primary_button.dart';
 import 'package:jk_tech_exam/widgets/fields/primary_text_field.dart';
@@ -45,7 +48,17 @@ class _CreatePasswordViewState extends State<CreatePasswordView> {
     final values = formKey.currentState?.value;
     if (values == null) return false;
     final password = values["password"] as String?;
-    return _isPasswordValid(password);
+    final agreeToTerms = values["agreeToTerms"] as bool?;
+    return _isPasswordValid(password) && agreeToTerms == true;
+  }
+
+  void onSubmit() {
+    if (formKey.currentState!.saveAndValidate()) {
+      final password = formKey.currentState?.value["password"];
+      context.read<RegisterBloc>().add(
+        RegisterAccountRequested(password: password!),
+      );
+    }
   }
 
   @override
@@ -67,95 +80,125 @@ class _CreatePasswordViewState extends State<CreatePasswordView> {
                       formKey.currentState?.save();
                       setState(() {});
                     },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          "Create Password",
-                          style: theme.textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 20.0),
-                        PrimaryTextField(
-                          hintText: "Enter your password here",
-                          name: "password",
-                          label: "Password",
-                          isRequired: true,
-                          showPasswordToggle: true,
-                          validators: [
-                            (v) {
-                              final s = v as String?;
-                              if (s == null || s.isEmpty) return null;
-                              return _isPasswordValid(s)
-                                  ? null
-                                  : "Password does not meet all requirements.";
-                            },
-                          ],
-                        ),
-                        _PasswordRules(
-                          password:
-                              formKey.currentState?.value["password"]
-                                  as String?,
-                        ),
-                        const SizedBox(height: 20.0),
-                        PrimaryButton(
-                          text: "Sign up",
-                          onPressed: () {},
-                          enabled: canSubmit(),
-                        ),
-                        const SizedBox(height: 20.0),
-                        FormBuilderCheckbox(
-                          visualDensity: const VisualDensity(horizontal: -4.0),
-                          checkColor: AppColor.primaryColor,
-                          name: "agreeToTerms",
-                          title: RichText(
-                            text: TextSpan(
-                              style: theme.textTheme.bodyMedium,
-                              text: "I have read and agree to the ",
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Terms of Use, Privacy Policy, Community Guidelines, ",
-                                  style: theme.textTheme.bodyMedium!.copyWith(
-                                    color: AppColor.primaryColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const TextSpan(text: "and "),
-                                TextSpan(
-                                  text: "Cookie Policy",
-                                  style: theme.textTheme.bodyMedium!.copyWith(
-                                    color: AppColor.primaryColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                    child: BlocConsumer<RegisterBloc, RegisterState>(
+                      listener: (context, state) {
+                        final route = ModalRoute.of(context);
+                        final isCurrentRoute = route?.isCurrent ?? false;
+                        if (state.status == RegisterStatus.success &&
+                            isCurrentRoute) {
+                          context.goNamed(HomePage.route);
+                        } else if (state.status == RegisterStatus.error &&
+                            isCurrentRoute) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                state.errorMessage ?? "An error occurred",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      builder: (context, state) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              "Create Password",
+                              style: theme.textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 20.0),
+                            PrimaryTextField(
+                              hintText: "Enter your password here",
+                              name: "password",
+                              label: "Password",
+                              isRequired: true,
+                              showPasswordToggle: true,
+                              validators: [
+                                (v) {
+                                  final s = v as String?;
+                                  if (s == null || s.isEmpty) return null;
+                                  return _isPasswordValid(s)
+                                      ? null
+                                      : "Password does not meet all requirements.";
+                                },
                               ],
                             ),
-                          ),
-                        ),
-                        const Spacer(),
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: theme.textTheme.bodyMedium,
-                            text: "Don't have an account yet? ",
-                            children: [
-                              TextSpan(
-                                text: "Sign in ",
-                                style: theme.textTheme.bodyMedium!.copyWith(
-                                  color: AppColor.primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    context.goNamed(LoginPage.route);
-                                  },
+                            _PasswordRules(
+                              password:
+                                  formKey.currentState?.value["password"]
+                                      as String?,
+                            ),
+                            const SizedBox(height: 20.0),
+                            state.status == RegisterStatus.loading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : PrimaryButton(
+                                    text: "Sign up",
+                                    onPressed: onSubmit,
+                                    enabled: canSubmit(),
+                                  ),
+                            const SizedBox(height: 20.0),
+                            FormBuilderCheckbox(
+                              visualDensity: const VisualDensity(
+                                horizontal: -4.0,
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24.0),
-                      ],
+                              checkColor: AppColor.whiteColor,
+                              name: "agreeToTerms",
+                              activeColor: AppColor.primaryColor,
+                              title: RichText(
+                                text: TextSpan(
+                                  style: theme.textTheme.bodyMedium,
+                                  text: "I have read and agree to the ",
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          "Terms of Use, Privacy Policy, Community Guidelines, ",
+                                      style: theme.textTheme.bodyMedium!
+                                          .copyWith(
+                                            color: AppColor.primaryColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                    ),
+                                    const TextSpan(text: "and "),
+                                    TextSpan(
+                                      text: "Cookie Policy",
+                                      style: theme.textTheme.bodyMedium!
+                                          .copyWith(
+                                            color: AppColor.primaryColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                style: theme.textTheme.bodyMedium,
+                                text: "Don't have an account yet? ",
+                                children: [
+                                  TextSpan(
+                                    text: "Sign in ",
+                                    style: theme.textTheme.bodyMedium!.copyWith(
+                                      color: AppColor.primaryColor,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        context.goNamed(LoginPage.route);
+                                      },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24.0),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),

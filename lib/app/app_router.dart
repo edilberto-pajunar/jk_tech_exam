@@ -9,13 +9,19 @@ import 'package:jk_tech_exam/features/dashboard/home/view/home_page.dart';
 import 'package:jk_tech_exam/features/dashboard/message/view/message_page.dart';
 import 'package:jk_tech_exam/features/dashboard/videos/view/videos_page.dart';
 import 'package:jk_tech_exam/features/dashboard/view/layout_view.dart';
+import 'package:jk_tech_exam/features/wrapper_page.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: "/home",
+    initialLocation: "/",
     routes: [
       GoRoute(
         path: "/",
+        name: WrapperPage.route,
+        builder: (context, state) => const WrapperPage(),
+      ),
+      GoRoute(
+        path: "/login",
         name: LoginPage.route,
         builder: (context, state) => const LoginPage(),
       ),
